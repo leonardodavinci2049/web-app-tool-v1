@@ -14,7 +14,7 @@ export interface ProductOfferV2 {
   sales: number;
   priceMax: string;
   priceMin: string;
-  productCats: number[];
+  productCatIds: number[];
   ratingStar: string;
   priceDiscountRate: number;
   imageUrl: string;
@@ -75,3 +75,18 @@ export interface ShopeeGraphQLResponse<T = unknown> {
 
 // GenerateShortLinkInput é exportado pelo schema Zod (validation/shopee-affiliate.schema.ts)
 // Não duplicar aqui — fonte única de verdade
+
+/**
+ * Response type for the enhanced generateShortLink method
+ */
+export interface GenerateShortLinkResponse {
+  success: boolean;
+  affiliateLink?: string;
+  productInfo?: ProductOfferV2;
+  databaseRecord?: {
+    recordId: string;
+    message: string;
+  };
+  error?: string;
+  message?: string;
+}

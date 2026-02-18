@@ -38,11 +38,8 @@ export type GenerateShortLinkInput = z.infer<typeof GenerateShortLinkSchema>;
 
 // productOfferV2 schemas
 export const ProductOfferV2Schema = z.object({
-  shopId: z.number().int().positive().optional(),
   itemId: z.number().int().positive().optional(),
-  productCatId: z.number().int().positive().optional(),
-  listType: z.number().int().min(0).max(6).optional(),
-  matchId: z.number().int().positive().optional(),
+  shopId: z.number().int().positive().optional(),
   keyword: z.string().max(100).optional(),
   sortType: z.number().int().min(1).max(5).optional(),
   page: z.number().int().positive().default(1),
