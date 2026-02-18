@@ -5,6 +5,8 @@ export { generateShortLink } from "./api-shopee-affiliate.service";
 
 // Tipos de resposta da API
 export type {
+  GenerateShortLinkResponse,
+  ProductOfferV2,
   ShopeeGraphQLResponse,
   ShortLinkResult,
 } from "./types/shopee-affiliate.types";

@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  type GenerateShortLinkResponse,
   GenerateShortLinkSchema,
   generateShortLink,
 } from "@/services/api-shopee-affiliate";
@@ -8,6 +9,8 @@ import {
 export interface GenerateAffiliateLinkResult {
   success: boolean;
   shortLink?: string;
+  productInfo?: GenerateShortLinkResponse["productInfo"];
+  databaseRecord?: GenerateShortLinkResponse["databaseRecord"];
   error?: string;
 }
 
@@ -18,7 +21,7 @@ export interface GenerateAffiliateLinkResult {
  * 1. Verificação de tipo básica (FormData pode conter null)
  * 2. Validação com Zod antes de chamar o serviço
  *
- * Erros já chegam sanitizados do serviço — não expõem detalhes internos.
+ * Erros já chegam sanitizados pelo serviço — não expõem detalhes internos.
  */
 export async function generateAffiliateLink(
   formData: FormData,
@@ -38,8 +41,16 @@ export async function generateAffiliateLink(
   }
 
   try {
-    const shortLink = await generateShortLink(parseResult.data.originUrl);
-    return { success: true, shortLink };
+    const response = await generateShortLink(parseResult.data.originUrl);
+    if (!response.success) {
+      return { success: false, error: response.error || response.message };
+    }
+    return {
+      success: true,
+      shortLink: response.affiliateLink,
+      productInfo: response.productInfo,
+      databaseRecord: response.databaseRecord,
+    };
   } catch (error) {
     // Erros já sanitizados pelo serviço — seguro retornar ao cliente
     const message =
