@@ -11,9 +11,10 @@ import { GenerateShortLinkSchema } from "./validation/shopee-affiliate.schema";
 const logger = createLogger("ApiShopeeAffiliateService");
 
 // Mutation GraphQL isolada como constante — fácil de manter e testar
+// A API Shopee não expõe um input type nomeado; as variáveis são escalares
 const GENERATE_SHORT_LINK_MUTATION = `
-  mutation GenerateShortLink($input: GenerateShortLinkInput!) {
-    generateShortLink(input: $input) {
+  mutation GenerateShortLink($originUrl: String!, $subIds: [String!]) {
+    generateShortLink(input: { originUrl: $originUrl, subIds: $subIds }) {
       shortLink
     }
   }
@@ -57,8 +58,6 @@ function toSafeErrorMessage(error: unknown): string {
 export async function generateShortLink(originUrl: string): Promise<string> {
   const requestId = randomUUID();
 
-  logger.info("Iniciando geração de short link Shopee", { requestId });
-
   // 1. Validar input com schema Zod
   const validated = GenerateShortLinkSchema.parse({ originUrl });
 
@@ -69,10 +68,8 @@ export async function generateShortLink(originUrl: string): Promise<string> {
     .filter(Boolean);
 
   const variables = {
-    input: {
-      originUrl: validated.originUrl,
-      subIds,
-    },
+    originUrl: validated.originUrl,
+    subIds,
   };
 
   try {
@@ -84,8 +81,6 @@ export async function generateShortLink(originUrl: string): Promise<string> {
     if (!data.generateShortLink?.shortLink) {
       throw new Error("Não foi possível gerar o link de afiliado");
     }
-
-    logger.info("Short link gerado com sucesso", { requestId });
 
     return data.generateShortLink.shortLink;
   } catch (error) {

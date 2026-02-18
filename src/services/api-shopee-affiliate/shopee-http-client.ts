@@ -35,23 +35,12 @@ function createShopeeHttpClient(): AxiosInstance {
 
     config.headers.Authorization = generateShopeeAuthHeader(payload);
 
-    logger.debug("Shopee API request", {
-      url: config.url,
-      method: config.method?.toUpperCase(),
-    });
-
     return config;
   });
 
   // Interceptor de resposta: logging estruturado
   instance.interceptors.response.use(
-    (response) => {
-      logger.debug("Shopee API response", {
-        status: response.status,
-        url: response.config.url,
-      });
-      return response;
-    },
+    (response) => response,
     (error) => {
       logger.error("Shopee API error", {
         status: error.response?.status,
