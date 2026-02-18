@@ -236,3 +236,26 @@ export function isApiSuccess(apiStatus: number): boolean {
 export function isApiError(apiStatus: number): boolean {
   return !isApiSuccess(apiStatus);
 }
+
+// ---------------------------------------------------------------------------
+// Shopee Affiliate API (GraphQL)
+// A URL base vem de SHOPEE_AFFILIATEENDPOINT (variável de ambiente)
+// ---------------------------------------------------------------------------
+
+export const SHOPEE_AFFILIATE_CONSTANTS = {
+  // Mutations disponíveis na API GraphQL da Shopee
+  MUTATIONS: {
+    GENERATE_SHORT_LINK: "generateShortLink",
+  },
+  // Timeout padrão em ms (fallback se a env não estiver definida)
+  DEFAULT_TIMEOUT: 10_000,
+  // Número máximo de subIds por requisição (limite da API Shopee)
+  MAX_SUB_IDS: 5,
+  // Domínios oficiais aceitos para geração de links
+  ALLOWED_DOMAINS: [
+    "shopee.com.br",
+    "shopee.com",
+    "shope.ee",
+    "s.shopee.com.br",
+  ],
+} as const;
