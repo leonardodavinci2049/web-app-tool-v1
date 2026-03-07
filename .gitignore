@@ -41,9 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 # others
+ecosystem.config.js
+.well-known
 .github/
 /docs
 tasks-project-next.md
-ecosystem.config.js
-AGENTS.md
-

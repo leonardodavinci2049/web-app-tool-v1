@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { generateAffiliateLink } from "./actions/shopee-actions";
+import { generateAffiliateLink } from "../actions/shopee-actions";
 
 export default function HomePage() {
   const [url, setUrl] = useState("");
