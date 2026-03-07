@@ -8,6 +8,19 @@ import {
 } from "mysql2/promise";
 import { envs } from "@/core/config/envs";
 
+
+// Tipos compatíveis com mysql2 v3.18+
+type SqlParam =
+  | string
+  | number
+  | bigint
+  | boolean
+  | Date
+  | null
+  | Buffer
+  | Uint8Array;
+type QueryParams = SqlParam[] | { [key: string]: SqlParam };
+
 // Classe de erro customizada para conexão com banco de dados
 export class ErroConexaoBancoDados extends Error {
   constructor(
@@ -99,7 +112,7 @@ class DatabaseService {
   // Método para SELECT (sem transação)
   async selectQuery<T extends RowDataPacket>(
     queryString: string,
-    params?: unknown[],
+    params?: QueryParams,
   ): Promise<T[]> {
     try {
       const pool = this.ensureConnection();
@@ -118,7 +131,7 @@ class DatabaseService {
   // Método para SELECT com segurança reforçada
   async selectExecute<T extends RowDataPacket>(
     queryString: string,
-    params?: unknown[],
+    params?: QueryParams[],
   ): Promise<T[]> {
     try {
       const pool = this.ensureConnection();
@@ -137,7 +150,7 @@ class DatabaseService {
   // Insert/Update/Delete usando execute
   async ModifyExecute(
     queryString: string,
-    params?: unknown[],
+    params?: QueryParams[],
   ): Promise<ResultSetHeader> {
     try {
       const pool = this.ensureConnection();
@@ -156,7 +169,7 @@ class DatabaseService {
   // Insert/Update/Delete usando query
   async ModifyQuery(
     queryString: string,
-    params?: unknown[],
+    params?: QueryParams[],
   ): Promise<ResultSetHeader> {
     try {
       const pool = this.ensureConnection();
