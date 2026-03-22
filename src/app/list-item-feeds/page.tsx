@@ -220,12 +220,13 @@ export default function ListItemFeedsPage() {
                 } catch {
                   parsed = { raw: row.columns };
                 }
+ 
 
                 const productName =
                   (parsed.product_name as string) ||
                   (parsed.productName as string) ||
                   `Produto ${index + 1}`;
-
+       
                 return (
                   <Card key={`${row.columns.slice(0, 30)}-${index}`}>
                     <CardContent className="py-3">
