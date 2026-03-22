@@ -8,6 +8,8 @@ import linkGenerationService from "@/services/db/link-generation/link-generation
 import { executeShopeeGraphQL } from "./shopee-graphql";
 import type {
   GenerateShortLinkResponse,
+  ItemFeedDataConnection,
+  ItemFeedListConnection,
   ProductOfferConnectionV2,
   ProductOfferV2,
   ShopeeOfferConnectionV2,
@@ -21,6 +23,10 @@ import {
 } from "./utils/url-utils";
 import {
   GenerateShortLinkSchema,
+  type GetItemFeedDataInput,
+  GetItemFeedDataSchema,
+  type ListItemFeedsInput,
+  ListItemFeedsSchema,
   type ProductOfferV2Input,
   ProductOfferV2Schema,
   type ShopeeOfferV2Input,
@@ -92,6 +98,39 @@ const SHOPEE_OFFER_V2_QUERY = `
         page
         limit
         hasNextPage
+      }
+    }
+  }
+`;
+
+const LIST_ITEM_FEEDS_QUERY = `
+  query ListItemFeeds($feedMode: FeedMode) {
+    listItemFeeds(feedMode: $feedMode) {
+      feeds {
+        datafeedId
+        datafeedName
+        referenceId
+        description
+        totalCount
+        date
+        feedMode
+      }
+    }
+  }
+`;
+
+const GET_ITEM_FEED_DATA_QUERY = `
+  query GetItemFeedData($datafeedId: String!, $offset: Int, $limit: Int) {
+    getItemFeedData(datafeedId: $datafeedId, offset: $offset, limit: $limit) {
+      rows {
+        columns
+        updateType
+      }
+      pageInfo {
+        offset
+        limit
+        totalCount
+        hasMore
       }
     }
   }
@@ -377,6 +416,88 @@ export async function getShopeeOfferList(
     return data.shopeeOfferV2;
   } catch (error) {
     logger.error("Falha ao obter lista de ofertas Shopee", {
+      requestId,
+      error,
+    });
+    throw new Error(toSafeErrorMessage(error));
+  }
+}
+
+/**
+ * Obtém a lista de feeds de ofertas de produtos da Shopee.
+ *
+ * @param params - Parâmetro feedMode (FULL ou DELTA)
+ * @returns Lista de feeds com informações de catálogo
+ * @throws Error com mensagem amigável em caso de falha
+ */
+export async function listItemFeeds(
+  params: ListItemFeedsInput,
+): Promise<ItemFeedListConnection> {
+  const requestId = randomUUID();
+
+  // 1. Validar input com schema Zod
+  const validated = ListItemFeedsSchema.parse(params);
+
+  // 2. Preparar variáveis da query
+  const variables = {
+    feedMode: validated.feedMode,
+  };
+
+  try {
+    // 3. Executar query via cliente dedicado
+    const data = await executeShopeeGraphQL<{
+      listItemFeeds: ItemFeedListConnection;
+    }>(LIST_ITEM_FEEDS_QUERY, variables);
+
+    if (!data.listItemFeeds) {
+      throw new Error("Não foi possível obter a lista de feeds de ofertas");
+    }
+
+    return data.listItemFeeds;
+  } catch (error) {
+    logger.error("Falha ao obter lista de feeds de ofertas Shopee", {
+      requestId,
+      error,
+    });
+    throw new Error(toSafeErrorMessage(error));
+  }
+}
+
+/**
+ * Obtém os detalhes dos produtos de um feed específico da Shopee.
+ *
+ * @param params - datafeedId, offset e limit para paginação
+ * @returns Lista de produtos com informações de paginação
+ * @throws Error com mensagem amigável em caso de falha
+ */
+export async function getItemFeedData(
+  params: GetItemFeedDataInput,
+): Promise<ItemFeedDataConnection> {
+  const requestId = randomUUID();
+
+  // 1. Validar input com schema Zod
+  const validated = GetItemFeedDataSchema.parse(params);
+
+  // 2. Preparar variáveis da query
+  const variables = {
+    datafeedId: validated.datafeedId,
+    offset: validated.offset,
+    limit: validated.limit,
+  };
+
+  try {
+    // 3. Executar query via cliente dedicado
+    const data = await executeShopeeGraphQL<{
+      getItemFeedData: ItemFeedDataConnection;
+    }>(GET_ITEM_FEED_DATA_QUERY, variables);
+
+    if (!data.getItemFeedData) {
+      throw new Error("Não foi possível obter os dados do feed de produtos");
+    }
+
+    return data.getItemFeedData;
+  } catch (error) {
+    logger.error("Falha ao obter dados do feed de produtos Shopee", {
       requestId,
       error,
     });

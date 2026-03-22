@@ -8,7 +8,6 @@ import {
 } from "mysql2/promise";
 import { envs } from "@/core/config/envs";
 
-
 // Tipos compatíveis com mysql2 v3.18+
 type SqlParam =
   | string

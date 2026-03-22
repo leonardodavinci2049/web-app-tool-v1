@@ -59,3 +59,19 @@ export const ShopeeOfferV2Schema = z.object({
 });
 
 export type ShopeeOfferV2Input = z.infer<typeof ShopeeOfferV2Schema>;
+
+// listItemFeeds schemas
+export const ListItemFeedsSchema = z.object({
+  feedMode: z.enum(["FULL", "DELTA"]).default("FULL"),
+});
+
+export type ListItemFeedsInput = z.infer<typeof ListItemFeedsSchema>;
+
+// getItemFeedData schemas
+export const GetItemFeedDataSchema = z.object({
+  datafeedId: z.string().min(1, "datafeedId é obrigatório"),
+  offset: z.number().int().min(0).default(0),
+  limit: z.number().int().positive().max(500).default(500),
+});
+
+export type GetItemFeedDataInput = z.infer<typeof GetItemFeedDataSchema>;

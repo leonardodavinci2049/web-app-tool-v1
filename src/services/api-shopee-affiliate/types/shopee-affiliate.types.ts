@@ -60,6 +60,43 @@ export interface ShopeeOfferConnectionV2 {
   pageInfo: PageInfo;
 }
 
+// ItemFeed (listItemFeeds)
+export type FeedMode = "FULL" | "DELTA";
+
+export interface ItemFeed {
+  datafeedId: string;
+  datafeedName: string;
+  referenceId: string;
+  description: string;
+  totalCount: number;
+  date: string;
+  feedMode: FeedMode;
+}
+
+export interface ItemFeedListConnection {
+  feeds: ItemFeed[];
+}
+
+// ItemFeedData (getItemFeedData)
+export type DeltaDataUpdateType = "NEW" | "UPDATE" | "DELETE";
+
+export interface ItemFeedDataRow {
+  columns: string;
+  updateType?: DeltaDataUpdateType;
+}
+
+export interface ItemFeedPageInfo {
+  offset: number;
+  limit: number;
+  totalCount: number;
+  hasMore: boolean;
+}
+
+export interface ItemFeedDataConnection {
+  rows: ItemFeedDataRow[];
+  pageInfo: ItemFeedPageInfo;
+}
+
 /**
  * Envelope genérico de resposta GraphQL da Shopee.
  * Genérico para suportar qualquer query ou mutation futura.
